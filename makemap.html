@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+	</head>
+	<body>
+		
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=404a52953a49f629543c6fcda65e0708"></script>
+<div id="clickLatlng" style="height:30px;"> </div>
+<!--div id="map" style="width:2560px;height:3000px;"></div-->
+		<div id="map" style="width:100%;height:0px;"></div>
+
+<script>
+	// bounds {da: 127.56075350960903, ka: 37.20196066782244, ia: 127.57530190515827, ja: 37.21540648209051}
+var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+    mapOption = { 
+        center: new kakao.maps.LatLng(37.208683807511726, 127.56802706105452), // 지도의 중심좌표 Ga: 127.56802706105452, Ha: 37.208683807511726}
+        level: 2 ,
+        mapTypeId: daum.maps.MapTypeId.SKYVIEW
+    };
+
+var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+
+// 지도를 클릭한 위치에 표출할 마커입니다
+var marker2 = new kakao.maps.Marker({ 
+    // 지도 중심좌표에 마커를 생성합니다 
+    position: map.getCenter() 
+}); 
+// 지도에 마커를 표시합니다
+marker2.setMap(map);
+/*
+var positions = [
+	
+ {
+        title: 'lb2lt', 
+        latlng: new kakao.maps.LatLng(37.20227594648123, 127.56117609689463)
+    },
+     {
+        title: 'rb2lb', 
+        latlng: new kakao.maps.LatLng(37.20227594648123, 127.57486993553819)
+    },
+    {
+        title: 'lt2rt', 
+        latlng: new kakao.maps.LatLng(37.21491560637255, 127.56117609689463)
+    },
+    {
+        title: 'rt2rb',
+        latlng: new kakao.maps.LatLng(37.21491560637255, 127.57486993553819)
+    },
+
+    //{ title:'bb1',latlng: new kakao.maps.LatLng(37.21491560637255, 127.56108961011877)}
+	 {
+        title: 'bound1', 
+        latlng: new kakao.maps.LatLng(37.20196066782244, 127.56075350960903)
+    },
+	 {
+        title: 'bound2', 
+        latlng: new kakao.maps.LatLng(37.21540648209051, 127.57530190515827)
+    },
+	
+		 {
+        title: 'bound3', 
+        latlng: new kakao.maps.LatLng(37.20191189431873, 127.57515441119943)
+    },
+			 {
+        title: 'bound4', 
+        latlng: new kakao.maps.LatLng(37.21545073330179, 127.56089270630994)
+    },
+];
+*/
+	var points =[];
+// 마커 이미지의 이미지 주소입니다
+var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png"; 
+    
+for (var i = 0; i < positions.length; i ++) {
+    
+    // 마커 이미지의 이미지 크기 입니다
+    var imageSize = new kakao.maps.Size(24, 35); 
+    
+    // 마커 이미지를 생성합니다    
+    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize); 
+    
+    // 마커를 생성합니다
+    var marker = new kakao.maps.Marker({
+        map: map, // 마커를 표시할 지도
+        position: positions[i].latlng, // 마커를 표시할 위치
+        title : positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+        image : markerImage // 마커 이미지 
+    });
+}
+// 지도에 클릭 이벤트를 등록합니다
+// 지도를 클릭하면 마지막 파라미터로 넘어온 함수를 호출합니다
+kakao.maps.event.addListener(map, 'click', function(mouseEvent) {        
+    
+    // 클릭한 위도, 경도 정보를 가져옵니다 
+    var latlng = mouseEvent.latLng; 
+    
+    // 마커 위치를 클릭한 위치로 옮깁니다
+    marker2.setPosition(latlng);
+    
+    var message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
+    message += '경도는 ' + latlng.getLng() + ' 입니다';
+    
+    var resultDiv = document.getElementById('clickLatlng'); 
+    resultDiv.innerHTML = message;
+    
+});
+	var proj = map.getProjection();
+	var bounds = map.getBounds();
+	console.log ( bounds )
+	console.log  ( proj.containerPointFromCoords(bounds.getNorthEast()) )
+	console.log ( proj.containerPointFromCoords(bounds.getSouthWest()) )
+</script>
+		<!--
+da {da: 127.56074099604712, ka: 37.20179178206958, ia: 127.57517669909504, ja: 37.21523814566814}
+
+		->
+	</body>
+</html>

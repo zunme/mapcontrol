@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title></title>
+		<!-- CSS only -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+		<!-- JS, Popper.js, and jQuery -->
+		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+		<script src="/js/waitimage.js"></script>
+		<script src="/js/sock.js"></script>
+		<script src="module.initdata.js"></script>
+		<style>
+			body { background-color:black}
+			#map {
+				display: inline-block;
+				width: 100%;
+				max-width:1600px;
+				min-width:500px;
+				background-color : #EEE;
+				height: 900px;
+			}
+			.map_inner{
+			margin: 0px;
+			padding: 0px;
+			position: relative;
+			background-size: 100%;
+			background-repeat: no-repeat;
+			}
+			.mark {
+			    position: absolute;
+				z-index: 100;
+				background-color: black;
+				width: 10px;
+				height: 10px;
+				transform: translate(-50%,-90%);
+			}
+		</style>
+	</head>
+	<body>
+		<section>
+			<div class="" id ="map">
+				<img src="/img/map_20170331190752603013.jpg"/>
+			 </div>
+		</section>
+		
+<script>
+	
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (global = global || self, global.Panzoom = factory());
+}(this, (function () {
+	var isInit = false;
+	var options = {
+        cursor: 'move',
+		imgWidth : 0,
+		imgHeight : 0,
+		imageSizeRatio : 0.0,
+        maxScale: 4,
+        //minScale: 0.125,
+        overflow: 'hidden',
+		center : true,
+        startX: 0,
+        startY: 0,
+        startScale: 1,
+        step: 0.1,
+		bound:{x:0, y:0},
+		wrapsize:{w:0, h:0 },
+		minsize : { w:0, h:0 },
+    };
+	var mapopt;
+	var elmn = null;
+	var mapDiv = null;
+	var active = false;
+    var currentX, currentY,initialX,initialY, xOffset , yOffset ;
+	
+	function Panzoom(obj, opt) {
+		const mark = {marker:{}} ;
+		var markReady = [] ;
+		var ws;
+		elmn = obj;
+		$('#map').waitForImages ( function() {
+			setMap('init');
+		});		
+		mapopt = opt; 
+		mapopt.w= mapopt.h= mapopt.r= mapopt.t= 0; mapopt.l= mapopt.b  =1000;
+		for ( var c in  opt.pos ) {
+			var a = opt.pos[c]
+			a.x > mapopt.w && (mapopt.w = a.x),
+            a.y > mapopt.h && (mapopt.h = a.y),
+            a.lng > mapopt.r && (mapopt.r = a.lng),
+            a.lng < mapopt.l && (mapopt.l = a.lng),
+            a.lat > mapopt.t && (mapopt.t = a.lat),
+            a.lat < mapopt.b && (mapopt.b = a.lat);
+		}
+		mapopt.diffLng = Math.ceil( (mapopt.r - mapopt.l) * 10000000);
+		mapopt.diffLat = Math.ceil( (mapopt.t  - mapopt.b) * 10000000);
+		mapopt.angle = Math.atan2(mapopt.pos.righttop.y - mapopt.pos.lefttop.y, mapopt.pos.righttop.x - mapopt.pos.lefttop.x) ;
+		mapopt.angleCos = Math.cos(mapopt.angle*-1)
+		mapopt.angleSin = Math.sin(mapopt.angle*-1)
+		
+		
+		function setMap( init ){
+			isInit = false;
+			options.imgWidth = $(elmn).children("img").width();
+			options.imgHeight = $(elmn).children("img").height();
+			options.imageSizeRatio = options.imgWidth / options.imgHeight;
+			options.wrapsize = {w:$(elmn).width(), h: $(elmn).height()};
+			$(elmn).css('overflow', 'hidden').css('position','relative').css('cursor', options.cursor);
+			$(elmn).children("img").hide();
+			var resetimgSize = getImageFullSize(options.wrapsize.w , options.wrapsize.h , options.imgWidth  , options.imgHeight);
+			options.minsize = { w : resetimgSize.width, h : resetimgSize.height }
+
+			var inner = $("<div class='map_inner' style='background-image: url(\""+ $(elmn).children("img").attr('src') +"\")'>");
+
+			$(inner).css('height' , resetimgSize.height).css('width', resetimgSize.width).css('position','absolute').css('top', '0').css('left', '0') ;
+			if ( options.center){
+				//options.startX = Math.ceil((resetimgSize.width - options.wrapsize.w) / 2)*-1;
+				//options.startY = Math.ceil((resetimgSize.height - options.wrapsize.h) / 2)*-1;
+			}
+			$(inner).css("transform", "translate3d(" + options.startX + "px, " + options.startY + "px, 0)" );
+
+			$(elmn).append(inner);
+			mapDiv = $(elmn).children("div.map_inner");
+			xOffset = options.startX, yOffset = options.startY;
+			isInit = true;
+			//sockinit();
+			if( init =='init') mapevent();
+			drawMark();
+		}
+
+		function sockinit() {
+			ws = MapSock( "ws://w3.smartscore.kr:17070/urban/99999?key=RhYaAzlpU1toCl1XUGd0WlJnAlw=", sockhandshake , cmd );
+		}
+		function sockhandshake() {
+			ws.send( mapopt.sockinit )
+		}
+		function sockclose() {
+			ws.close()
+		}
+		function mapevent(){
+			$(elmn).on("mousedown", dragStart);
+			$(elmn).on("mouseup", dragEnd);
+			$(elmn).on("mousemove", drag);
+			$(elmn).on("mouseout", dragOut);
+
+			$(elmn).on("touchstart", dragStart);
+			$(elmn).on("touchend", dragEnd);
+			$(elmn).on("touchmove", drag);
+
+			$(elmn).on("mousewheel", zoom);		
+			$(window).resize(resize);
+			
+		}
+		function getImageFullSize_old(a, b, c, d) {
+			a / b < options.imageSizeRatio ? (a = b,
+			b = b / d * c) : (b = a,
+			a = a / c * d);
+			console.log ( a, b, c, d)
+			console.log ( b, a)
+			options.bound = {x :b, y:a}
+			return {
+				width: b,
+				height: a
+			}
+		}
+		function getImageFullSize( wrap_w, wrap_h, img_w, img_h){
+			var wRatio = wrap_w / img_w;
+			var hRatio = wrap_h / img_h;
+			if ( wRatio >= hRatio ){
+				var neww = wrap_w;
+				var newh = img_h * wrap_w / img_w ;
+				console.log ( "11")
+
+			}else {
+				var neww = img_w * wrap_h / img_h ;		
+				var newh = wrap_h
+				console.log ("22")
+			}
+			options.bound = {x :neww, y:newh}
+			return { width : neww , height : newh } 
+			
+			var ratio  = Math.max ( wRatio, hRatio );
+			console.log ( "wRatio" + wRatio )
+			console.log ( "hRatio" + hRatio )
+			console.log ( "Ratio" + ratio )
+			
+			var neww = img_w *ratio;
+			var newh = img_h*ratio;
+			options.bound = {x :neww, y:newh}
+			return { width : neww , height : newh }
+		}
+		function resetimg(w, h) {
+			options.bound.x = w;
+			options.bound.y = h;
+			$(mapDiv).css("width",w).css("height",h);
+			var boundx =  options.wrapsize.w-options.bound.x; 
+			var boundy =  options.wrapsize.h-options.bound.y; 
+			var x = xOffset;
+			var y = yOffset;
+			if ( typeof options.zoompoint =='undefined'){
+				if (boundx > xOffset ) x =  boundx ;
+				if (boundy > yOffset ) y =  boundy ;
+				if( x != xOffset || y != yOffset) {
+					xOffset = x, yOffset = y;
+					$(mapDiv).css("transform", "translate3d(" + xOffset + "px, " + yOffset + "px, 0)" );
+				}
+			}else {
+				var offx = ((Math.floor(options.bound.x * options.zoompoint.xperct) ) -  options.zoompoint.x) * -1 ;
+				var offy = ((Math.floor(options.bound.y * options.zoompoint.yperct) ) -  options.zoompoint.y) * -1;
+				if (boundx > offx ) offx =  boundx ;
+				if (boundy > offy ) offy =  boundy ;
+				if( offx != xOffset || offy != yOffset) {
+					xOffset = offx, yOffset = offy;
+					$(mapDiv).css("transform", "translate3d(" + xOffset + "px, " + yOffset + "px, 0)" );
+				}
+				delete options.zoompoint;
+				//console.log ( options.zoompoint, Math.floor(options.bound.x * options.zoompoint.xperct), Math.floor(options.bound.y * options.zoompoint.yperct) , options.bound );
+			}
+			resetOverlay();
+		}
+		function resize(e){
+			if( options.wrapsize.w != $(elmn).width() || options.wrapsize.h != $(elmn).height()  ){
+				var boundx =  $(elmn).width() -options.bound.x; 
+				var boundy =  $(elmn).height()-options.bound.y;
+				var tmp = options.wrapsize;
+				var offx = xOffset, offy=yOffset;
+				options.wrapsize.w = $(elmn).width() , options.wrapsize.h = $(elmn).height();
+				
+				if (boundx > xOffset ) offx =  boundx ;
+				if (boundy > yOffset ) offy =  boundy ;
+				//if ( offx != xOffset || offy != yOffset){
+					if ( offx > 0 || offy > 0){
+						xOffset=0; yOffset = 0;
+						$(mapDiv).css("transform", "translate3d(" +offx + "px, " + offy + "px, 0)" );
+					}else {
+						$(mapDiv).css("transform", "translate3d(" +offx + "px, " + offy + "px, 0)" );
+						xOffset =offx, yOffset = offy;
+					}
+					resetimgSize = getImageFullSize(options.wrapsize.w , options.wrapsize.h , options.imgWidth  , options.imgHeight);
+					resetimg( resetimgSize.width, resetimgSize.height  )
+				//}
+
+				/*
+				options.startX = Math.ceil(($(mapDiv).width() - options.wrapsize.w) / 2)*-1;
+				options.startY = Math.ceil(($(mapDiv).height() - options.wrapsize.h) / 2)*-1;
+			    $(mapDiv).css("transform", "translate3d(" + options.startX + "px, " + options.startY + "px, 0)" );
+			    xOffset = options.startX, yOffset = options.startY;
+				*/
+				
+			}
+		}
+		function zoom(e){
+			e.preventDefault();
+			//zomm 마우스커서위주로 줌
+			options.zoompoint = {
+				x: e.clientX, 
+				y : e.clientY,
+				xperct : (e.clientX -xOffset)  / options.bound.x, 
+				yperct : (e.clientY -yOffset)  / options.bound.y
+			}
+			if(!isInit) return false;
+			if (e.originalEvent.wheelDelta >= 0) {
+				zoomplus();
+			}else {
+				zoomminus();
+			}
+		}
+		function zoomplus() {
+			var newwidth = options.step * options.imgWidth + options.bound.x
+			var newheight = options.step * options.imgHeight + options.bound.y
+			if ( newwidth > options.imgWidth * options.maxScale || newheight > options.imgHeight * options.maxScale ) {
+				newwidth = options.imgWidth;newheight = options.imgHeight;
+			}
+			if ( newwidth == options.bound.x ) return false;
+			resetimg( newwidth, newheight );
+		}
+		function zoomminus() {
+			var newwidth = options.bound.x - options.step * options.imgWidth
+			var newheight = options.bound.y - options.step * options.imgHeight 
+			if ( newwidth < options.minsize.w || newheight < options.minsize.h ) {
+				newwidth = options.minsize.w;newheight = options.minsize.h;
+			}
+			if ( newwidth == options.bound.x ) return false;
+			resetimg( newwidth, newheight );			
+		}
+		function dragStart(e) {
+		  if(!isInit) return false;
+		  if (e.type === "touchstart") {
+			initialX = e.touches[0].clientX - xOffset;
+			initialY = e.touches[0].clientY - yOffset;
+		  } else {
+			initialX = e.clientX - xOffset;
+			initialY = e.clientY - yOffset;
+		  }
+		  if ($(e.target) === mapDiv) {
+			active = true;
+		  }
+		  active = true;
+		}
+		function dragEnd(e) {
+		  if(!isInit) return false;
+		  initialX = currentX;
+		  initialY = currentY;
+
+		  active = false;
+		}
+		function dragOut(e){
+			active = false;
+		}
+		function drag(e) {
+		  if (active && isInit ) {    
+			e.preventDefault();
+			var boundx =  options.wrapsize.w-options.bound.x; 
+			var boundy =  options.wrapsize.h-options.bound.y; 
+
+			if (e.type === "touchmove") {
+			  currentX = e.touches[0].clientX - initialX;
+			  currentY = e.touches[0].clientY - initialY;
+			} else {
+			  currentX = e.clientX - initialX;
+			  currentY = e.clientY - initialY;
+			}
+			if( currentX > 0 ) currentX = 0;
+			else if (boundx > currentX ) currentX =  boundx ;
+
+			if( currentY > 0 ) currentY = 0;
+			else if (boundy > currentY ) currentY =  boundy ;
+
+			xOffset = currentX;
+			yOffset = currentY;
+
+			$(mapDiv).css("transform", "translate3d(" + currentX + "px, " + currentY + "px, 0)" );
+		  }
+		}
+		function resetOverlay () {
+				$(mapDiv).children('.mapmarker').each( function () {
+					var lat = $(this).data('lat') 
+					var lng =  $(this).data('lng')
+					var id = $(this).attr('id')
+					var point = getPoint( { lat:lat , lng:lng });
+					$(this).css("top", point.y ).css("left", point.x )
+					markInfochange( id, point );
+				});
+		}
+
+		function getPoint( geo ){
+				var w = Math.ceil((geo.lng -mapopt.l) * 10000000 ) , h = Math.ceil((geo.lat - mapopt.b) * 10000000 )
+	var tmp = ((mapopt.w * w / mapopt.diffLng) - mapopt.pos.lefttop.x) * mapopt.angleSin + ((mapopt.h - mapopt.h * h / mapopt.diffLat) - mapopt.pos.lefttop.y) * mapopt.angleCos + mapopt.pos.lefttop.y;
+				geo.x = Math.round((Math.round(((mapopt.w * w / mapopt.diffLng) - mapopt.pos.lefttop.x) * mapopt.angleCos - ((mapopt.h - mapopt.h * h / mapopt.diffLat) - mapopt.pos.lefttop.y) * mapopt.angleSin + mapopt.pos.lefttop.x) - mapopt.pos.lefttop.x ) * ( options.bound.x.toFixed(2) /  options.imgWidth ) );
+				geo.y = Math.round((tmp - mapopt.pos.lefttop.y) * (options.bound.y.toFixed(2) / options.imgHeight ) )
+				return geo;
+		}
+		function drawMark() {
+			/* 임시저장된 마커 처리 */
+			$.each( markReady, function (ind, val){setMark(val); if(ind+1 >= markReady.length) markReady=[] } )
+		}
+		function setMark( latlng ){
+			/* 마커에 아이디 추가*/
+			latlng[mapopt.idkey] =(typeof latlng[mapopt.idkey] =='undefined') ? '_' + Math.random().toString(36).substr(2, 9) : latlng[mapopt.idkey] ;
+			if( !isInit ){
+				/* 지도 초기화가 끝나지 않은상태에서는 마커를 임시 저장*/
+				markReady.push( latlng );
+				return latlng[mapopt.idkey];
+			}else {
+				var point = getPoint( latlng );
+				point[mapopt.idkey] = latlng[mapopt.idkey] ;
+				if (typeof mark.marker[point[mapopt.idkey]] == 'undefined'){
+					//point draw
+					div = $("<div class='mark mapmarker' />").attr('id', point[mapopt.idkey] ).data('lat', latlng.lat).data('lng', latlng.lng).css("top", point.y ).css("left", point.x )
+					$(mapDiv).append($(div))
+					mark.marker[point[mapopt.idkey]] = point;
+					return latlng[mapopt.idkey];
+				}else {
+					// 마커 아이디가 존재하면 위치 MOVE
+					$(mapDiv).children( "#" + point[mapopt.idkey] ).data('lat', latlng.lat).data('lng', latlng.lng).css("top", point.y ).css("left", point.x );
+					markInfochange( point[mapopt.idkey] , point )
+				}
+			}
+		}
+
+		function removeMark( id ){
+			$(mapDiv).children('#'+id).remove()
+			delete mark.marker[id]
+		}
+		function getMark(){
+			return mark;
+		}
+		function markInfochange( id, point ){
+			mark.marker[id].lat = point.lat;
+			mark.marker[id].lng = point.lng;
+			mark.marker[id].x = point.x;
+			mark.marker[id].y = point.y;
+		}
+		function initdata( data ){
+			$.each( data[mapopt.cmdlist.init] , function (idx, val){
+				setMark( val )
+			})
+		}
+		function cmd ( data ){
+			if( typeof data != 'object') data = JSON.parse(data);
+			switch ( data[mapopt.cmdkey] ){
+				case  mapopt.cmdlist.init :
+					initdata(data)
+					break;
+				case  mapopt.cmdlist.setmark :
+					setMark(data)
+					break;
+				case  mapopt.cmdlist.removemark :
+					removeMark(data)
+					break;
+			}
+		}
+		return {
+			getPoint:getPoint,
+			resetOverlay:resetOverlay,
+			setMark:setMark,
+			getMark:getMark,
+			removeMark : removeMark,
+			zoomplus : zoomplus, 
+			zoomminus : zoomminus,
+			initdata : initdata,
+			cmd : cmd,
+			sockinit:sockinit,
+			sockclose : sockclose
+		}
+	}
+
+return Panzoom;
+})));
+	
+	
+	var Panzoom = Panzoom( "#map", {
+		"idkey" : "devIdx", //marker id key
+		"cmdkey" : "cmd", 
+		"cmdlist" : {
+			"init" : "list", // 마커 위치 초기화
+			"setmark" : "loc",
+			"removemark" : "loc_k"
+		},
+		"pos" : 
+			{ 
+			  lefttop : {lat:37.20021269699, lng:127.56121929626, x:0, y:1942 },
+			  leftbottom : {lat:37.199729659203, lng:127.57351726072 , x : 1093, y: 1989 },
+			  righttop : {lat:37.217705982112, lng:127.56225018775 , x:80, y:0 } ,
+			  rightbottom : {lat:37.217222814904, lng:127.57455098205, x : 1173, y: 47 } 
+			},
+		"sockinit":{svc: "msg", cmd: "init", cbi: "41", type: "cs"}
+	} );
+	//Panzoom.getPoint({lat: 37.2136043, lng: 127.5731618});
+	//37.208706158929836 이고, 경도는 127.5713420123623 자유 원
+	/*
+	Panzoom.setMark ( {lat:37.208706158929836, lng:127.5713420123623, id:13244, type:'cart'})
+	//37.20862763033386 이고, 경도는 127.57174415058914 주차장
+	Panzoom.setMark ( {lat:37.20862763033386, lng:127.57174415058914})
+	Panzoom.setMark ( {lat: 37.213709, lng: 127.5732527})
+	Panzoom.setMark ( {lat:37.208706158929836, lng:127.5633420123623, id:13244, type:'cart'}) //마크 이동 테스트
+	*/
+	//Panzoom.initdata( test_init_data )
+	
+</script>
+
+	</body>
+</html>

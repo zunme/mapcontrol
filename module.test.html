@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title></title>
+		<!-- CSS only -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+		<!-- JS, Popper.js, and jQuery -->
+		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.0.1/mustache.min.js" crossorigin="anonymous"></script>
+		
+		<script src="/js/waitimage.js"></script>
+		<script src="/js/sock.js"></script>
+		<script src="/js/course.js"></script>
+		<!-- 임시 데이터 로드 해서 사용 -->
+		<script src="module.initdata.js"></script>
+		<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+		<style>
+			:root {
+			  --bg-108: #ff0000;
+			  --color-108: #ff0000;
+			  --bg-109: #2e7baf;
+			  --color-109: #2e7baf;
+			}
+			html, body { background-color:white; height:100%;margin:0;overflow:hidden}
+			section.main{width: 100%;   height: 100%;position:relative;}
+			section.mainRight{width:100%;height:100%; postion:relative;}
+			section.mainRight > div.mainRightWrap {width:100%; height:100%; position:relative;}
+			.main.leftmenuOn  section.mainRight{padding-left:250px;}
+			
+			section.mainLeft{
+				background-color:#343435; position:absolute; top:0 ; left:0 ; width:250px; height:100%;z-index: 10000;
+				box-shadow: 8px 0 10px -6px black;
+				padding: 40px 20px;
+				color:white;
+			}
+			.leftmenu_header_wrap{
+				text-align:center; 
+				color: #4a4c4d;
+				border-color:#4a4c4d;
+				font-size: 22px;
+				font-weight:800;
+			}
+			.leftmenu_header_wrap > div {
+				border-bottom: 3px solid;
+				padding-bottom: 6px;
+			}
+			.menuon {
+				color : #128091;
+				border-color : #128091;
+			}
+			
+			.left_menu_item_wrap{
+				margin: 25px 0;
+			}
+			.left_menu_title{
+				padding-bottom: 10px;
+				border-bottom: 1px solid white;
+				margin-bottom: 10px;
+				font-size: 16px;
+			}
+			
+			.menuappend_on::before{
+				content: "\25bc";/* \25bc */
+				float:right;
+				color:gray;
+			}
+			.menuappend_off:before{
+				content: "\25b2"; /* \25b2 */
+				float:right;
+				color:gray;
+			}
+			
+			.downarrow:after{
+				content: "";
+				margin:0 0.5em;
+				display:inline-block;
+				border: 7px solid transparent;
+				border-top:8px solid gray;
+				border-bottom:0 none;
+			}
+			.coursecolorbox .coursecoloritem {
+				display: inline-block;
+				width: 48%;
+				cursor: pointer;
+			}
+			.coursecolorbox .coursecoloritem::before{
+			   content: '';
+			   display: inline-block;
+			   width: 15px;
+			   height: 15px;
+			   -moz-border-radius: 7.5px;
+			   -webkit-border-radius: 7.5px;
+			   border-radius: 7.5px;
+			   background-color: #69b6d5;
+			   margin-right: 3px;
+			   vertical-align: -10%;
+			}
+			
+			
+			section.header{
+				height: 74px;
+				font-size: 24px;
+				padding: 14px 40px 0 40px;
+			}
+			.header_wrap{
+				    padding: 0;height: 100%;;
+			}
+			
+			.mainRight.mapview > div.mainRightWrap > section.header{
+				position: absolute;
+				top: 0;
+				left: 0;
+				background-color: rgba(52, 52, 53, 0.63);
+				width: 100%;
+				z-index: 9000;
+				color:white;
+			}
+			.mainRight.courseview > div.mainRightWrap > section.header{
+				background-color:white;
+				color:black;
+			}
+			/*
+			.mainRight.courseview > div.mainRightWrap > section.header > .header_wrap{
+				border-bottom : 3px solid #75a8ca;
+			}
+			*/
+			#mainright.courseview  .mapsection{display:none}
+			#mainright.mapeview  .coursesection{display:none}
+			
+			.mapsection {height:100%;padding:0;position:relative;}
+			.coursesection {height:100%;padding:0;position:relative;background-color:white;padding:0 40px;}
+
+			
+			#map {
+				display: inline-block;
+				width: 100%;
+				min-width:500px;
+				background-color : #EEE;
+				height: 100%;
+				max-height : 1200px;
+				min-height : 400px;
+			}
+			.map_inner{
+			margin: 0px;
+			padding: 0px;
+			position: relative;
+			background-size: contain;
+			background-repeat: no-repeat;
+			}
+			.mark {
+				position: absolute;
+				z-index: 100;
+				/* background-color: black; */
+				width: 80px;
+				height: 28px;
+				/*transform: translate(-50%,-100%);*/
+				padding: 0;
+				opacity: 0.7;
+				background-color:transparent;
+			}
+			.mapmarker2{
+					position: absolute;
+				z-index: 100;
+				/* background-color: black; */
+				width: 10px;
+				height: 10px;
+				transform: translate(-50%,-100%);
+				padding: 0;
+				opacity: 0.8;
+				background-color:black;			
+			}
+			.triangle-border {
+				position: relative;
+				padding: 1px;
+				/* margin: 1em 0 3em; */
+				border: 1px solid white;
+				color: #333;
+				font-size: 12px;
+				color: white;
+				text-align: center;
+				font-weight: 600;
+			}
+			.triangle-border:before {
+				content: "";
+				position: absolute;
+				bottom: -10px;
+				left: 30px;
+				border-width: 10px 10px 0;
+				border-style: solid;
+				border-color: white transparent;
+				display: block;
+				width: 0;
+			}
+			.triangle-border:after {
+				content: "";
+				position: absolute;
+				bottom: -8px;
+				left: 31px;
+				border-width: 9px 9px 0;
+				border-style: solid;
+				display: block;
+				width: 0;
+			}
+			
+			/* 코스뷰 */
+			.coursenamewrap, .courselinewrap {
+				display:inline-block;
+    			vertical-align: top;
+			}
+			.coursenamewrap {
+				width:150px;
+			}
+			.coursebox{padding: 30px 0 0}
+			.course_th_row{
+				height: 30px;
+				position:relative;
+			}
+			.course_td_row{
+				width:100%;
+				position:relative;
+			}
+			.coursehallname {
+				position: absolute;
+    			height: 100%;
+				min-whdti:20px;
+				min-height:20px;
+			    font-size : 20px;
+				text-align:center;
+			}
+			.courseline{
+				height: 4px;
+				width: 100%;
+				background: #eee;
+				/* border-radius: 5px; */
+				top: 50%;
+				transform: translateY(-50%);
+				position: relative;
+			}
+			.coursehallrange{
+				position: absolute;
+				height: 100%;
+				background-color: black;
+			}
+			.courseline .circle {
+				width: 12px;
+				height: 12px;
+				background: #e97162;
+				border-radius: 50%;
+				position: absolute;
+				top: -4px;
+				cursor: pointer;
+			}
+			.courseline .circle .popupSpan{
+				width: auto;
+				height: auto;
+				padding: 10px;
+				white-space: nowrap;
+				display: inline-block;
+				position: absolute;
+				left: -40px;
+				display: none;
+				transition: all 0.1s ease-out;
+				display: block;
+				
+				font-size:12px;
+			}
+			 .circleOdd .popupSpan{
+				top: -40px;
+			}
+			 .circleEven) .popupSpan{
+				top: 14px;
+			}
+			
+			.waitingbox{
+				height: 50px;
+				width: 100%;
+				border: 1px solid;
+				margin-bottom: 10px;
+			}
+			.waitingbox .waiting {display:inline-block;margin-right: 10px;}
+			#waiting .waiting {display:inline-block; width:48%;}
+			#waiting .waiting::before{
+			   content: '';
+			   display: inline-block;
+			   width: 15px;
+			   height: 15px;
+			   -moz-border-radius: 7.5px;
+			   -webkit-border-radius: 7.5px;
+			   border-radius: 7.5px;
+			   background-color: #69b6d5;
+			   margin-right: 3px;
+				vertical-align: -10%;
+			}
+			.courseend {color :grey}
+			
+			#waiting .waiting.courseend::before{
+				content:'E';
+				vertical-align:10%;
+				color: white;
+				font-size: 6px;
+				padding-left: 4px;
+				opacity: 0.7;
+			}
+			
+			
+			/* 코스뷰컬러 */
+			.coursecoloritem.course108::before{
+				background-color : var(--bg-108);
+				color : var( --color-108);
+			}
+			.coursecoloritem.course109::before{
+				background-color : var(--bg-109);
+			}
+			
+			.mapmarker.course108 > .triangle-border {
+				background: var(--bg-108);
+			}
+			.mapmarker.course109 > .triangle-border {
+				background: var(--bg-109);
+			}
+			
+			.mapmarker.course108 > .triangle-border:after {
+				border-color: var(--bg-108) transparent;
+			}
+			.mapmarker.course109 > .triangle-border:after {
+				border-color: var(--bg-109) transparent;
+			}
+			
+			#coursebox108{border-top: 3px solid var(--bg-108); }
+			#coursebox109{border-top: 3px solid var(--bg-109); }
+			/*
+			코스 홀이름 
+			#courlinewrap108 { color: var(--color-108) }
+			#courlinewrap109 { color: var(--color-109) }
+			*/
+			#courlinewrap108 .coursehallrange  { background-color :  var(--bg-108); var(--color-108);}
+			#courlinewrap109 .coursehallrange  { background-color : var(--bg-109); color: var(--color-109);}
+			
+			.course108.circle { background-color :  var(--bg-108); color: var(--color-108)}
+			.course109.circle { background-color : var(--bg-109); color: var(--color-109);}
+			
+			#waiting .waiting.course108::before{
+				background-color : var(--bg-108);
+			}
+			#waiting .waiting.course109::before{
+				background-color : var(--bg-109);
+			}
+			 .waitingbox .waiting.course108{
+				color : var(--color-108);
+			}
+			.waitingbox .waiting.course109{
+				color : var(--color-109);
+			}
+			
+			
+			
+			
+			
+			/* bootstrap */
+			.modal {
+			   top: 50px;
+			   z-index: 10040;
+			}
+			.modal-title {
+				font-size: 18px;
+				font-weight: 800;
+			}
+			.searchresult{
+				padding: 10px 20px 0;
+			}
+			.searchresult .searched{
+				margin-top: 8px;
+				border-bottom: 1px solid silver;
+				padding-bottom: 5px;
+			}
+			.searchresult .searched:last-child{
+				border-bottom: none;
+			}
+			.searchresult .searched::before {
+				content: '';
+				display: inline-block;
+				width: 15px;
+				height: 15px;
+				-moz-border-radius: 7.5px;
+				-webkit-border-radius: 7.5px;
+				border-radius: 7.5px;
+				background-color: #69b6d5;
+				margin-right: 3px;
+				vertical-align: -10%;
+			}
+			.searchresult .searched.course108::before{
+				background-color : var(--bg-108);
+			}
+			.searchresult .searched.course109::before{
+				background-color : var(--bg-109);
+			}
+		</style>
+	</head>
+	<body>
+		<section class="main leftmenuOn">
+			
+			<!-- left menu -->
+			<section class="mainLeft">
+				<div class="leftmenu_wrap">
+					
+					<div class="leftmenu_header container">
+						<div class="leftmenu_header_wrap row">
+							<div class="left_menu_header_map col-sm menuon" data-view="map">
+								지도뷰
+							</div>
+							<div class="left_menu_header_course col-sm"  data-view="course">
+								코스뷰
+							</div>
+						</div>
+					</div>
+					<div class="left_menu_item_wrap">
+						<div class="left_menu_title menuappend menuappend_on">
+							코스색상
+						</div>
+						<div class="coursecolorbox">
+							<div class="coursecoloritem course109" data-id="109">
+								IN
+							</div>
+							<div class="coursecoloritem course108" data-id="108">
+								OUT
+							</div>
+						</div>
+					</div>					
+					<div class="left_menu_item_wrap">
+						<div class="left_menu_title menuappend menuappend_on">
+							대기카트
+						</div>
+						<div id="waiting">
+						
+						</div>
+					</div>
+					
+				</div>
+			</section>
+			<!-- / left menu -->
+			
+			<section id="mainright" class="mainRight mapview">
+				<div class="mainRightWrap">
+					<section class="header">
+						<div class="header_wrap">
+							<span class="fullscreen"> FULL </span>
+							<span data-toggle="modal" data-target="#searchcadide_dialog">
+							  캐디검색
+							</span>
+						</div>
+					</section>
+					<section id="mapsection" class="mapsection">
+						<div class="" id ="map">
+							<img src="/img/daummap2_ro.jpg"/>
+
+						 </div>
+						<div class="bottom_menu">
+
+						</div>
+					</section>
+					<!-- course view-->
+					<section id="coursesection" class="coursesection">
+						<div class="course_wrap" id="courseboxarea">
+							
+							
+						</div>
+					</section>
+					<!-- /course view -->
+				</div>
+			</section>
+		</section>
+		
+		
+		
+<!-- Modal -->
+<div class="modal fade" id="searchcadide_dialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" >캐디검색</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		 <div>
+	        <div class="input-group">
+			  <div class="input-group-prepend">
+				<span class="input-group-text">캐디명</span>
+			  </div>
+			  <input type="text" class="form-control" name="caddiesearch" id="caddiesearch">
+			</div>	 
+		 </div>
+		  <div class="searchresult" id="caddie_searchresult">
+			  
+		  </div>
+      </div>
+      <div class="modal-footer">
+		<button type="button" class="btn btn-primary btn-sm" onClick="searchcaddie()">검색</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">취소</button>
+      </div>
+    </div>
+  </div>
+</div>
+		
+		
+		
+<script id="template-coursebox" type="text/template">
+<div class="coursebox" id="coursebox{{id}}">
+	<div class="coursenamewrap">
+		<div class="course_th_row">
+
+		</div>
+		<div class="course_td_row">
+			<div>
+				{{courseName}}
+			</div>
+			<div>
+				COURSE
+			</div>
+			<div>
+				<div class="coursebox_count" id="countbox{{id}}">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="courselinewrap" id="courlinewrap{{id}}">
+		<div class="course_th_row">
+				{{#hall}}
+					<div class="coursehallname" style="width: 0px;left :0" data-width="{{size.width}}" data-left="{{size.left}}">
+					{{hole}}홀
+					</div>
+				{{/hall}}
+		</div>
+		<div class="course_td_row">
+			<div class="courseline" id="courline{{id}}">
+				{{#hall}}
+				<div class="coursehallrange" style="width: 0px;left :0" data-width="{{size.width}}" data-left="{{size.left}}"></div>
+				{{/hall}}
+			</div>
+		</div>
+		<div class="waitingbox" id="waiting{{id}}"></div>
+	</div>
+</div>
+</script>
+<script id="template-coursebox-caddie" type="text/template">
+	<div class="circle course{{startcourse}}" id="circle{{id}}" style="left: {{left}}%;" data-left="{{left}}">
+		<div class="popupSpan">{{name}}</div>
+	</div>
+</script>
+<script id="template-coursebox-caddie-waiting" type="text/template">
+	<div class="waiting course{{startcourse}} {{#isEnd}}courseend{{/isEnd}}" id="waiting{{id}}" >{{name}}</div>
+</script>
+		
+<script>
+var myColor = localStorage['myColor']
+if( typeof myColor != 'undefined'){
+	myColor = JSON.parse(myColor)
+	for ( var cid in myColor ){
+		document.documentElement.style.setProperty('--bg-' + myColor[cid].id,  myColor[cid].color);
+		document.documentElement.style.setProperty('--color-' + myColor[cid].id,  myColor[cid].color);
+	}
+}else myColor ={};
+	
+$(document).ready( function () {
+	$(".leftmenu_header_wrap > div").on( "click", function () {
+		if( $(this).hasClass("menuon")) return;
+		var viewtype = $(this).data("view");
+		$(".leftmenu_header_wrap > div.menuon").removeClass('menuon');
+		$(this).addClass("menuon")
+		$("#mainright").removeClass("mapview").removeClass("courseview").addClass(viewtype+"view");
+		
+	})
+	$(".menuappend").on("click", function () {
+		if( $(this).hasClass("menuappend_on")) {
+			$(this).removeClass("menuappend_on").addClass("menuappend_off")
+			$(this).next().hide()
+			console.log ( $(this).parent().next() ) 
+		}else {
+			$(this).removeClass("menuappend_off").addClass("menuappend_on")
+			$(this).next().show()
+		}
+	})
+	$( ".coursecolorbox > .coursecoloritem ").each ( function() {
+		var coloritem = this;
+		var color = getComputedStyle(document.documentElement).getPropertyValue('--bg-' + $(coloritem).data("id") );
+		new Picker({
+            parent: coloritem,
+            popup: true,
+            alpha: false,
+            editor: true,
+            color: color ,
+            onChange: function(color) {
+            },
+			onDone: function(color) {
+				var id= $(coloritem).data("id")
+				document.documentElement.style.setProperty('--bg-' + id ,color.rgbaString);
+				document.documentElement.style.setProperty('--color-' + id , color.rgbaString);
+                //parentCustom.style.background = color.rgbaString;
+				//document.documentElement.style.setProperty('--mouse-x', e.clientX + "px");
+				myColor["course_" + id] = { id : id , color : color.rgbaString }
+				localStorage['myColor'] = JSON.stringify(myColor);
+            },
+        });
+	});
+	/*캐디검색*/
+	$('#caddiesearch').keydown(function() {
+	  if (event.keyCode === 13) {
+		event.preventDefault();
+		searchcaddie();
+	  };
+	});
+})
+function searchcaddie() {
+	var res = Panzoom.searchMark('caddieName', $("#caddiesearch").val() , true);
+	$("#caddie_searchresult").empty();
+	if (res.length < 1) {
+		$("#caddie_searchresult").html('<div class="nonedata">검색된 캐디가 없습니다.</div>')
+	}else if (res.length == 1){
+		viewcaddieinfo( res[0].caddieIdx )
+	}else {
+		$.each ( res , function ( idx, row){
+			$("#caddie_searchresult").append('<div class="searched course'+row.fci+'" data-id="' + row.caddieIdx+ '" onClick="viewcaddieinfo(' +  row.caddieIdx + ')">'+ row.caddieName +'</div>');
+		})
+	}
+	$('#searchcadide_dialog').modal('handleUpdate')
+}
+function viewcaddieinfo( id )	{
+	$('#searchcadide_dialog').modal('toggle');
+	alert ( "TODO")
+}
+	
+	
+function search(source, key ,name, isLike ) {
+    var results;
+    results = $.map(source, function(entry) {
+		var match = false;
+		if ( isLike == true ){
+			match = entry[key].indexOf(name) !== -1;
+		}else {
+			match = ( entry[key] == name )
+		}
+        return match ? entry : null;
+    });
+    return results;
+}
+
+
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (global = global || self, global.Panzoom = factory());
+}(this, (function () {
+	var isInit = false;
+	var options = {
+        cursor: 'move',
+		imgWidth : 0,
+		imgHeight : 0,
+		imageSizeRatio : 0.0,
+        maxScale: 4,
+        //minScale: 0.125,
+        overflow: 'hidden',
+		center : true,
+        startX: 0,
+        startY: 0,
+        startScale: 1,
+        step: 0.1,
+		bound:{x:0, y:0},
+		wrapsize:{w:0, h:0 },
+		minsize : { w:0, h:0 },
+    };
+	var mapopt;
+	var elmn = null;
+	var mapDiv = null;
+	var active = false;
+    var currentX, currentY,initialX,initialY, xOffset , yOffset ;
+	
+	function arrayMakeKey( data, key ) {
+				var ret ={}
+				for ( var i in data ){
+					if ( key =='') ret[i] = data[i]
+					else ret[ data[i][key]] = data[i]
+				}
+			return ret;
+	}
+
+	function Panzoom(obj, opt) {
+		const mark = {marker:{}} ;
+		const markinCourse={}
+		var markReady = [] ;
+		var ws ;
+		var coursebox ;
+		elmn = obj;
+		$('#map').waitForImages ( function() {
+			setMap('init');
+		});		
+		mapopt = opt; 
+		mapopt.w= mapopt.h= mapopt.r= mapopt.t= 0; mapopt.l= mapopt.b  =1000;
+		if ( mapopt.defaultdata.caddies != 'undefined'){
+			mapopt.defaultdata.caddies = arrayMakeKey ( mapopt.defaultdata.caddies , 'idx' )
+		}
+		for ( var c in  opt.pos ) {
+			var a = opt.pos[c]
+			a.x > mapopt.w && (mapopt.w = a.x),
+            a.y > mapopt.h && (mapopt.h = a.y),
+            a.lng > mapopt.r && (mapopt.r = a.lng),
+            a.lng < mapopt.l && (mapopt.l = a.lng),
+            a.lat > mapopt.t && (mapopt.t = a.lat),
+            a.lat < mapopt.b && (mapopt.b = a.lat);
+		}
+		mapopt.diffLng = Math.ceil( (mapopt.r - mapopt.l) * 10000000);
+		mapopt.diffLat = Math.ceil( (mapopt.t  - mapopt.b) * 10000000);
+		mapopt.angle = Math.atan2(mapopt.pos.righttop.y - mapopt.pos.lefttop.y, mapopt.pos.righttop.x - mapopt.pos.lefttop.x) ;// to angle * -1
+		mapopt.angleCos = Math.cos(mapopt.angle*-1)
+		mapopt.angleSin = Math.sin(mapopt.angle*-1)
+		
+		
+		function setMap( init ){
+			isInit = false;
+			options.imgWidth = $(elmn).children("img").width();
+			options.imgHeight = $(elmn).children("img").height();
+			options.imageSizeRatio = options.imgWidth / options.imgHeight;
+			options.wrapsize = {w:$(elmn).width(), h: $(elmn).height()};
+			$(elmn).css('overflow', 'hidden').css('position','relative').css('cursor', options.cursor);
+			$(elmn).children("img").hide();
+			var resetimgSize = getImageFullSize(options.wrapsize.w , options.wrapsize.h , options.imgWidth  , options.imgHeight);
+			options.minsize = { w : resetimgSize.width, h : resetimgSize.height }
+
+			var inner = $("<div class='map_inner' style='background-image: url(\""+ $(elmn).children("img").attr('src') +"\")'>");
+
+			$(inner).css('height' , resetimgSize.height).css('width', resetimgSize.width).css('top', '0').css('left', '0') ;//.css('position','absolute')
+			if ( options.center){
+				options.startX = Math.ceil((resetimgSize.width - options.wrapsize.w) / 2)*-1;
+				options.startY = Math.ceil((resetimgSize.height - options.wrapsize.h) / 2)*-1;
+			}
+			$(inner).css("transform", "translate3d(" + options.startX + "px, " + options.startY + "px, 0)" );
+
+			$(elmn).append(inner);
+			mapDiv = $(elmn).children("div.map_inner");
+			xOffset = options.startX, yOffset = options.startY;
+			isInit = true;
+			/*todo*/
+			coursebox = CourseBox(mapopt.idkey )
+			sockinit(mapopt.url);
+			if( init =='init') mapevent();
+			drawMark();
+		}
+
+		function sockinit(url) {
+			ws = MapSock( "ws://"+url, sockhandshake , cmd );
+		}
+		function sockhandshake() {
+			ws.send( mapopt.sockinit )
+		}
+		function sockclose() {
+			ws.close()
+		}
+		function mapevent(){
+			$(elmn).on("mousedown", dragStart);
+			$(elmn).on("mouseup", dragEnd);
+			$(elmn).on("mousemove", drag);
+			$(elmn).on("mouseout", dragOut);
+
+			$(elmn).on("touchstart", dragStart);
+			$(elmn).on("touchend", dragEnd);
+			$(elmn).on("touchmove", drag);
+
+			$(elmn).on("mousewheel", zoom);		
+			$(window).resize(resize);
+			$(".fullscreen").on("click", function () {
+				if (!document.fullscreenElement) {
+					document.documentElement.requestFullscreen();
+					resize();
+				  } else {
+					if (document.exitFullscreen) {
+					  document.exitFullscreen(); 
+					  resize();
+					}
+				}
+			});
+		}
+		function getImageFullSize( wrap_w, wrap_h, img_w, img_h){
+			var neww, newh; 
+			wrap_w = $(elmn).width();
+			wrap_h = $(elmn).height();
+			options.wrapsize.w = wrap_w;
+			options.wrapsize.h = wrap_h;
+
+			( wrap_w / img_w >= wrap_h / img_h ) ? ( neww = wrap_w, newh = img_h * wrap_w / img_w ) : ( neww = img_w * wrap_h / img_h, newh = wrap_h);
+			options.bound = {x :neww, y:newh}
+			return { width : neww , height : newh } 
+		}
+		function resetimg(w, h) {
+			options.bound.x = w;
+			options.bound.y = h;
+			$(mapDiv).css("width",w).css("height",h);
+			var boundx =  options.wrapsize.w-options.bound.x; 
+			var boundy =  options.wrapsize.h-options.bound.y; 
+			var x = xOffset;
+			var y = yOffset;
+			if ( typeof options.zoompoint =='undefined'){
+				if (boundx > xOffset ) x =  boundx ;
+				if (boundy > yOffset ) y =  boundy ;
+				if( x != xOffset || y != yOffset) {
+					xOffset = x, yOffset = y;
+					$(mapDiv).css("transform", "translate3d(" + xOffset + "px, " + yOffset + "px, 0)" );
+				}
+			}else {
+				var offx = ((Math.floor(options.bound.x * options.zoompoint.xperct) ) -  options.zoompoint.x) * -1 ;
+				var offy = ((Math.floor(options.bound.y * options.zoompoint.yperct) ) -  options.zoompoint.y) * -1;
+				
+				(boundx > offx ) &&(offx =  boundx), (boundy > offy ) &&(offy =  boundy), (offx > 0 ) && (offx = 0), (offy > 0 ) && (offy = 0);
+				if( offx != xOffset || offy != yOffset) {
+					xOffset = offx, yOffset = offy;
+					$(mapDiv).css("transform", "translate3d(" + xOffset + "px, " + yOffset + "px, 0)" );
+				}
+				delete options.zoompoint;
+			}
+			resetOverlay();
+		}
+		function resize(){
+			if( options.wrapsize.w != $(elmn).width() || options.wrapsize.h != $(elmn).height()  ){
+
+				var boundx =  $(elmn).width() -options.bound.x; 
+				var boundy =  $(elmn).height()-options.bound.y;
+				var tmp = options.wrapsize;
+				var offx = xOffset, offy=yOffset;
+				options.wrapsize.w = $(elmn).width() , options.wrapsize.h = $(elmn).height();
+				
+				(boundx > xOffset ) && (offx =  boundx),(boundy > yOffset )&&( offy =  boundy),(offx > 0) && (offx = 0), (offy > 0) && (offy = 0);
+
+				$(mapDiv).css("transform", "translate3d(" +offx + "px, " + offy + "px, 0)" );
+				xOffset =offx, yOffset = offy;
+
+				resetimgSize = getImageFullSize(options.wrapsize.w , options.wrapsize.h , options.imgWidth  , options.imgHeight);
+				resetimg( resetimgSize.width, resetimgSize.height  )
+				
+			}
+		}
+		function zoom(e){
+			e.preventDefault();
+			//zomm 마우스커서위주로 줌
+			options.zoompoint = {
+				x: e.clientX, 
+				y : e.clientY,
+				xperct : (e.clientX -xOffset)  / options.bound.x, 
+				yperct : (e.clientY -yOffset)  / options.bound.y
+			}
+			if(!isInit) return false;
+			if (e.originalEvent.wheelDelta >= 0) {
+				zoomplus();
+			}else {
+				zoomminus();
+			}
+		}
+		function zoomplus() {
+			var newwidth = options.step * options.imgWidth + options.bound.x
+			var newheight = options.step * options.imgHeight + options.bound.y
+			if ( newwidth > options.imgWidth * options.maxScale || newheight > options.imgHeight * options.maxScale ) {
+				newwidth = options.imgWidth* options.maxScale;newheight = options.imgHeight;
+			}
+			if ( newwidth == options.bound.x ) return false;
+			resetimg( newwidth, newheight );
+		}
+		function zoomminus() {
+			var newwidth = options.bound.x - options.step * options.imgWidth
+			var newheight = options.bound.y - options.step * options.imgHeight 
+			if ( newwidth < options.minsize.w || newheight < options.minsize.h ) {
+				newwidth = options.minsize.w;newheight = options.minsize.h;
+			}
+			if ( newwidth == options.bound.x ) return false;
+			resetimg( newwidth, newheight );			
+		}
+		function dragStart(e) {
+		  if(!isInit) return false;
+		  if (e.type === "touchstart") {
+			initialX = e.touches[0].clientX - xOffset;
+			initialY = e.touches[0].clientY - yOffset;
+		  } else {
+			initialX = e.clientX - xOffset;
+			initialY = e.clientY - yOffset;
+		  }
+		  if ($(e.target) === mapDiv) {
+			active = true;
+		  }
+		  active = true;
+		}
+		function dragEnd(e) {
+		  if(!isInit) return false;
+		  initialX = currentX;
+		  initialY = currentY;
+
+		  active = false;
+		}
+		function dragOut(e){
+			active = false;
+		}
+		function drag(e) {
+		  if (active && isInit ) {    
+			e.preventDefault();
+			var boundx =  options.wrapsize.w-options.bound.x; 
+			var boundy =  options.wrapsize.h-options.bound.y; 
+
+			if (e.type === "touchmove") {
+			  currentX = e.touches[0].clientX - initialX;
+			  currentY = e.touches[0].clientY - initialY;
+			} else {
+			  currentX = e.clientX - initialX;
+			  currentY = e.clientY - initialY;
+			}
+			if( currentX > 0 ) currentX = 0;
+			else if (boundx > currentX ) currentX =  boundx ;
+
+			if( currentY > 0 ) currentY = 0;
+			else if (boundy > currentY ) currentY =  boundy ;
+
+			xOffset = currentX;
+			yOffset = currentY;
+
+			$(mapDiv).css("transform", "translate3d(" + currentX + "px, " + currentY + "px, 0)" );
+		  }
+		}
+		function resetOverlay () {
+				$(mapDiv).children('.mapmarker').each( function () {
+					var lat = $(this).data('lat') 
+					var lng =  $(this).data('lng')
+					var id = $(this).attr('id')
+					var point = getPoint( { lat:lat , lng:lng });
+					$(this).css("top", point.y ).css("left", point.x )
+					markInfochange( id, point );
+				});
+		}
+
+		function getPoint( geo ){
+				var w = Math.ceil((geo.lng -mapopt.l) * 10000000 ) , h = Math.ceil((geo.lat - mapopt.b) * 10000000 )
+	var tmp = ((mapopt.w * w / mapopt.diffLng) - mapopt.pos.lefttop.x) * mapopt.angleSin + ((mapopt.h - mapopt.h * h / mapopt.diffLat) - mapopt.pos.lefttop.y) * mapopt.angleCos + mapopt.pos.lefttop.y;
+				geo.x = Math.round((Math.round(((mapopt.w * w / mapopt.diffLng) - mapopt.pos.lefttop.x) * mapopt.angleCos - ((mapopt.h - mapopt.h * h / mapopt.diffLat) - mapopt.pos.lefttop.y) * mapopt.angleSin + mapopt.pos.lefttop.x) - mapopt.pos.lefttop.x ) * ( options.bound.x.toFixed(2) /  options.imgWidth ) );
+				geo.y = Math.round((tmp - mapopt.pos.lefttop.y) * (options.bound.y.toFixed(2) / options.imgHeight ) )
+			
+				return geo;
+		}
+
+		function drawMark() {
+			/* 임시저장된 마커 처리 */
+			$.each( markReady, function (ind, val){setMark(val); if(ind+1 >= markReady.length) markReady=[] } )
+		}
+		function setMark( latlng ){
+			/* 마커에 아이디 추가*/
+			latlng[mapopt.idkey] =(typeof latlng[mapopt.idkey] =='undefined') ? '_' + Math.random().toString(36).substr(2, 9) : latlng[mapopt.idkey] ;
+			if( !isInit ){
+				/* 지도 초기화가 끝나지 않은상태에서는 마커를 임시 저장*/
+				markReady.push( latlng );
+			}else {
+				var point = getPoint( latlng );
+				point[mapopt.idkey] = latlng[mapopt.idkey] ;
+				if (typeof mark.marker[point[mapopt.idkey]] == 'undefined'){
+					//point draw
+					var caddieName = mapopt.defaultdata.caddies[latlng[mapopt.idkey]].caddie_name
+					div = $('<div class="mark mapmarker course' + latlng.fci + '"><p class="triangle-border">'+caddieName+'</p></div>').attr('id', point[mapopt.idkey] ).data('lat', latlng.lat).data('lng', latlng.lng).css("top", point.y ).css("left", point.x )
+					$(mapDiv).append($(div))
+					//mark.marker[point[mapopt.idkey]] = point;
+					//return latlng[mapopt.idkey];
+				}else {
+					// 마커 아이디가 존재하면 위치 MOVE
+					$(mapDiv).children( "#" + point[mapopt.idkey] ).data('lat', latlng.lat).data('lng', latlng.lng).css("top", point.y ).css("left", point.x );
+					//markInfochange( point[mapopt.idkey] , point )
+					//console.log ( point )
+				}
+				//setInCourse( mark.marker[point[mapopt.idkey]] , latlng, point );
+				markInfochange( point[mapopt.idkey] , point )
+				//mark.marker[point[mapopt.idkey]] = point;
+			}
+			return latlng[mapopt.idkey]
+		}
+		function setInCourse( olddata , latlng ){
+
+		}
+		function showall( ){
+			$(".mapmarker").each ( function () {
+				$(this).show()
+			})
+		}
+		function showhide( data ){
+			if ( data.length > 0 ) {
+				/* only find */
+				var keys = [];
+				for ( var i in data ) {
+					keys.push ( ""+data[i][mapopt.idkey])
+				}
+				$(".mapmarker").each ( function () {
+					if (keys.includes( $(this).attr("id") ) ) $(this).show()
+					else $(this).hide();
+				});
+			}
+				
+		}
+		function removeMark( id ){
+			$(mapDiv).children('#'+id).remove()
+			delete mark.marker[id]
+			coursebox.unsetdata(id)
+		}
+		function getMark(){
+			return mark;
+		}
+		function markInfochange( id, point ){
+			var caddieName = '';
+			if ( typeof mark.marker[id] == "undefined" || typeof mark.marker[id].caddieName == 'undefined'){
+				if( typeof mapopt.defaultdata.caddies[id] != 'undefined') caddieName = mapopt.defaultdata.caddies[id].caddie_name
+			}else caddieName = mark.marker[id].caddieName;
+			mark.marker[id] = point;
+			mark.marker[id].caddieName = caddieName;
+			coursebox.setData( mark.marker[id] )
+		}
+		function initdata( data ){
+			$.each( data[mapopt.cmdlist.init] , function (idx, val){
+				setMark( val )
+			})
+		}
+		function cmd ( data ){
+			if( typeof data != 'object') data = JSON.parse(data);
+			switch ( data[mapopt.cmdkey] ){
+				case  mapopt.cmdlist.init :
+					initdata(data)
+					break;
+				case  mapopt.cmdlist.setmark :
+					setMark(data)
+					break;
+				case  mapopt.cmdlist.removemark :
+					removeMark(data)
+					break;
+			}
+		}
+
+		return {
+			getPoint:getPoint,
+			resetOverlay:resetOverlay,
+			setMark:setMark,
+			getMark:getMark,
+			removeMark : removeMark,
+			zoomplus : zoomplus, 
+			zoomminus : zoomminus,
+			initdata : initdata,
+			//cmd : cmd,
+			getMarkinCourse:function () {return markinCourse;},
+			getOptions: function() {return {options:options,mapopt:mapopt}},
+			sockinit:sockinit,
+			sockclose : sockclose,
+			showall : showall,
+			searchMark : function(key, name, isLike, usehide ){ //Panzoom.searchMark('caddieName', '양금복', true, true)
+				var res= search ( mark.marker, key, name, isLike )
+				if (usehide == true ) showhide( res )
+				return res
+			},
+		}
+	}
+
+return Panzoom;
+})));
+	
+	
+	var Panzoom = Panzoom( "#map", {
+		"idkey" : "caddieIdx", //marker id key
+		"cmdkey" : "cmd", 
+		"cmdlist" : {
+			"init" : "list", // 마커 위치 초기화
+			"setmark" : "loc",
+			"removemark" : "loc_k"
+		},
+		"pos" : 
+			{ 
+				/*
+			  lefttop : {lat:37.20196066782244, lng:127.56075350960903, x:0, y:3000 },
+			  leftbottom : {lat:37.20191189431873, lng:127.57515441119943 , x : 2599, y: 3000 },
+			  righttop : {lat:37.21545073330179, lng:127.56089270630994 , x:4, y:5 } ,
+			  rightbottom : {lat:37.21545073330179, lng:127.56089270630994, x : 2599, y: 0 } 
+			  */
+				///img/daummap2_ro.jpg
+			  lefttop : {lat:37.21545073330179, lng:127.56089270630994, x:4, y:3000 },
+			  leftbottom : {lat:37.20196066782244, lng:127.56075350960903 , x : 2580, y: 2995 },
+			  righttop : {lat:37.21540648209051, lng:127.57530190515827 , x:4, y:0 } ,
+			  rightbottom : {lat:37.21545073330179, lng:127.56089270630994, x : 2599, y: 0 } 
+			},
+		"sockinit":{svc: "msg", cmd: "init", cbi: "41", type: "cs"},
+		"url":"w3.smartscore.kr:17070/urban/99999?key=RhYaAzlpU1toCl1XUGd0WlJnAVI=",
+		"defaultdata" : init_data.data
+	} );
+	//Panzoom.getPoint({lat: 37.2136043, lng: 127.5731618});
+	//37.208706158929836 이고, 경도는 127.5713420123623 자유 원
+	/*
+	Panzoom.setMark ( {lat:37.208706158929836, lng:127.5713420123623, id:13244, type:'cart'})
+	//37.20862763033386 이고, 경도는 127.57174415058914 주차장
+	Panzoom.setMark ( {lat:37.20862763033386, lng:127.57174415058914})
+	Panzoom.setMark ( {lat: 37.213709, lng: 127.5732527})
+	Panzoom.setMark ( {lat:37.208706158929836, lng:127.5633420123623, id:13244, type:'cart'}) //마크 이동 테스트
+	*/
+	//Panzoom.initdata( test_init_data )
+</script>
+
+	</body>
+</html>
